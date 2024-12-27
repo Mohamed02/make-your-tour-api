@@ -1,0 +1,5 @@
+node_modules
+src/dev-data/templates/*
+src/dev-data/img/*
+public/*
+.env.*

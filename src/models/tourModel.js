@@ -1,8 +1,7 @@
 import mongoose from "mongoose";
-import { type } from "os";
 import slugify from 'slugify';
-import validator from 'validator';
-import UserModel from "./userModel";
+import UserModel from "./userModel.js";
+import ReviewModel from "./reviewModel.js";
 const tourSchema = new mongoose.Schema({
     name: {
       type: String,
@@ -116,6 +115,12 @@ const tourSchema = new mongoose.Schema({
   tourSchema.virtual('durationWeeks').get(function(){
     return this.duration/7;
   });
+  
+  tourSchema.virtual('reviews', {
+    ref: 'Review',
+    foreignField: 'tour',
+    localField: '_id'
+  });
 
   // DOCUMENT MIDDLEWARE: runs before .save() and .create()
   tourSchema.pre('save', function(){
@@ -139,11 +144,23 @@ const tourSchema = new mongoose.Schema({
         this.start = Date.now();
         next();
     });
+    // pre or before find query
+    tourSchema.pre(/^find/, function(next){
+      this.populate({
+        path: 'guides',
+        select: '-__v -passwordCreatedAt'
+      });
+      next();
+    });
         // post or after find query
     tourSchema.post(/^find/, function(docs,next){
         console.log(`The query took ${Date.now()  - this.start} milliseconds`);
         next();
     });
+    tourSchema.post('findById', function(docs,next){
+      docs.populate('reviews')
+      next();
+  });
 
 // AGGREGATION MIDDLEWARE
 

@@ -19,5 +19,5 @@ router.patch('/resetpassword/:token', resetpassword);
 router.patch('/updateme', protect, updateme);
 router.delete('/deleteme', protect, deleteMe);
 router.get('/', getAllUsers).post('/', createUser);
-router.get('/:id', getUser).put(':id', updateUser).delete(':id', deleteUser);
+router.route('/:id').get(getUser).patch(updateUser).delete(deleteUser);
 export default router;

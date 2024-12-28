@@ -46,9 +46,11 @@ export const login = async (req,res,next) => {
     // check if email and passwowrd is available in the request body
     if(!email || !password){
         return next(new AppError('Please provdie email and password !', 400));
-    }
+    }   
+    console.log('email', email);
     // check if requested user is available in the datablse
     const user = await User.findOne({email}).select('+password');
+    
     if(!user || ! await user.correctPassword(password, user.password)){
         return next(new AppError('Invalid Username or Password !', 404));
     }
@@ -166,10 +168,7 @@ export const protect = catchAsync(async (req,res,next)=>{
 
 export const restrictTo = (roles)=>{
     return catchAsync(async (req,res,next)=>{
-        console.log('roles', roles);
-        console.log('req.user.role', req.user);
         if(!roles.includes(req.user.role) ){
-            console.log('not an admin');
             return next(new AppError('UnAuthorized to perform this operation'));
         }
         next();

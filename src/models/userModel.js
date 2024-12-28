@@ -77,7 +77,6 @@ userSchema.methods.passwordChanged = async function(jwtTimeStamp){
 };
 userSchema.methods.generatePasswordResetToken = async function(){
 
-    console.log('generateing  forgot passowred');
     const resetToken = crypto.randomBytes(32).toString('hex');
     const hashResetToken= crypto.createHash('sha256').update(resetToken).digest('hex');
     const expirytime = Date.now()+ 10 * 60 * 1000;

@@ -1,6 +1,8 @@
+import { Model } from "mongoose";
 import User from "../models/userModel.js";
 import { AppError } from "../utils/appError.js";
 import { catchAsync } from "../utils/catchAsync.js";
+import handlerfactory from "./handlerFactory.js";
 
 const filterObject = (obj, allowedList) =>{
   let newObj = {};
@@ -22,18 +24,7 @@ export const getAllUsers = async(req, res) => {
     data: users,
     });
 };
-export const getUser = catchAsync( async(req, res) => {
-    const user = await User.findOne({email: req.body.email});
-    if(!user){
-      return next(new AppError('No Tour found with the given ID'),404);
-    }
-      res.status(200).json({
-        status: 'success',
-        results: TourVal,
-        data: TourVal,
-      });
-  
-});
+export const getUser = handlerfactory.getOne(User);
 
 export const updateme = catchAsync(async (req, res, next)  => {
 
@@ -63,5 +54,6 @@ export const deleteMe = catchAsync(async (req, res, next) => {
   })
 });
 export const createUser = (req, res) => {};
-export const updateUser = (req, res)  => {};
-export const deleteUser = (req, res) => {};
+/// Donot Update the Password with this
+export const updateUser = handlerfactory.updateOne(User);
+export const deleteUser = handlerfactory.deleteOne(User);

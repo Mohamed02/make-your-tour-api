@@ -1,3 +1,4 @@
+import { APIFeature } from "../utils/apiFeatures.js";
 import { AppError } from "../utils/appError.js";
 import { catchAsync } from "../utils/catchAsync.js";
 const handlerfactory ={
@@ -52,6 +53,26 @@ const handlerfactory ={
       },
     });
   
+  }),
+  getAll: (Model)=> catchAsync(async (req, res, next) => {
+
+    /* Tech debt - added below condtion specific for getrevious
+       to support nested GET request of review on tour object.
+       */
+      let filter ={}
+      if(req.params.tourId) filter={tour:req.params.tourId}
+    // Tech debt 
+
+    const query =  Model.find(filter);
+    let apiFeatures = new APIFeature(query, req.query).filter().sort().fieldLimit().pagination();
+
+      // const docs = await apiFeatures.query.explain();  // use explain to get the statistic of query
+      const docs = await apiFeatures.query;
+      res.status(200).json({
+        status: 'success',
+        results: docs.length,
+        data: docs,
+      });
   }),
 }
 

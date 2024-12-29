@@ -25,50 +25,29 @@ export const aliasTopTours = (req,res,next)=>{
   req.query.fields = 'name,price,ratingsAverage,summary,difficulty';
   next();
 }
-export const getAllTours = catchAsync(async (req, res, next) => {
-  const query =  Tour.find();
-    let apiFeatures={};
-    if(req.query){
-      apiFeatures = new APIFeature(query, req.query).filter().sort().fieldLimit().pagination();
-    }else{
-      apiFeatures["query"]= query;
-    }
-    const AllTours = await query;
-    res.status(200).json({
-      status: 'success',
-      requestTime: req.requestTime,
-      results: AllTours.length,
-      data: AllTours,
-    });
-});
+export const getAllTours = handlerfactory.getAll(Tour);
 export const getTour = handlerfactory.getOne(Tour,'reviews');
 
 
-export const createTour = catchAsync(async (req, res, next) => {
-      const newTour = await Tour.create({
-        ...req.body
-      });
-        res.status(201).json({
-                status: 'success',
-                data: newTour,
-              });
-});
+export const createTour = handlerfactory.createOne(Tour)
 export const updateTour= handlerfactory.updateOne(Tour);
 export const deleteTour =  factory.deleteOne(Tour)
 
 export const getTourStats = catchAsync(async(req, res, next)=>{
     const stats = await Tour.aggregate([
       {$match: {ratingsAverage: {$gte: 4.5}}},
-      {$group: { 
-        _id: {$toUpper:'$difficulty'},
-        numOfTours: {$sum: 1},
-        numOfRating: {$sum: '$ratingsQuantity'},
-        avgRating:{$avg:'$ratingsAverage'},
-        avgPrice:{$avg: '$price'},
-        minPrie: {$min: '$price'},
-        maxPrice: {$max: '$price'},
+      {
+          $group: { 
+          _id: {$toUpper:'$difficulty'},
+          numOfTours: {$sum: 1},
+          numOfRating: {$sum: '$ratingsQuantity'},
+          avgRating:{$avg:'$ratingsAverage'},
+          avgPrice:{$avg: '$price'},
+          minPrie: {$min: '$price'},
+          maxPrice: {$max: '$price'},
 
-      }},
+        }
+      },
       {$sort: { numOfRating:1}},
       {$match: { _id: {$eq: 'DIFFICULT'}}}
     ]);
@@ -123,3 +102,55 @@ export const getMonthlyPlans =async (req, res, next)=>{
     data: tourPlan
   })
 }
+
+export const getToursWithin = catchAsync(async (req,res,next) => {
+  const {distance, latlong, unit} = req.params;
+  const [lat, long] = latlong.split(',');
+  const radius = (unit ==='miles') ? distance/3963.2: distance/6378.1;
+  if(!lat || !long){
+    next(new AppError('Please provide that latlong in the format XXXX,XXXX',400)) ;
+  }
+  const tours = await Tour.find(
+    {
+      startLocation: {
+            $geoWithin: { $centerSphere: [[long,lat], radius]}
+          }
+    }
+  );
+  
+  res.status(200).json({
+    status:'success',
+    results: tours.length,
+    data:{
+      tours
+    }
+  });
+});
+
+export const getDistancesFromPoint = catchAsync(async (req,res,next) => {
+  const {latlong, unit} = req.params;
+  const [lat, long] = latlong.split(',');
+  if(!lat || !long){
+    next(new AppError('Please provide that latlong in the format XXXX,XXXX',400)) ;
+  }
+  const distances = await Tour.aggregate([
+    {
+      $geoNear: {
+        near: {
+          type: 'Point',
+          coordinates: [long * 1, lat * 1]
+        },
+        distanceField: 'distance'
+      }
+    }
+  ]);
+  
+  res.status(200).json({
+    status:'success',
+    results: tours.length,
+    data:{
+      distances
+    }
+  });
+});
+

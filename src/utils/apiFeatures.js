@@ -5,6 +5,7 @@ export class APIFeature {
       this.queryString = queryString;
     }
     filter(){
+      // when the url is in the format api/v1/tours?duration[gte]=10&rating=3
       if(this.queryString){
         const queryObj = {...this.queryString};
         // delete all non filter query params
@@ -12,7 +13,6 @@ export class APIFeature {
         nonFilteringParams.forEach(el=>delete queryObj[el]);
         // Advanced Filtering
         let formattedQuery = JSON.stringify(queryObj).replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`);
-        console.log('formattedQuery', formattedQuery);
         this.query.find(JSON.parse(formattedQuery));
       }
       return this;

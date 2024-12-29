@@ -70,10 +70,14 @@ userSchema.methods.correctPassword = async function(candidatePassword, userPassw
     return bcrypt.compare(candidatePassword, userPassword);
 };
 userSchema.methods.passwordChanged = async function(jwtTimeStamp){
+    if(!this.passwordCreatedAt) {
+        return false;
+    }
     const changedTimeStamp = Math.floor(this.passwordCreatedAt.getTime() / 1000);
     console.log('changedTimeStamp', changedTimeStamp);
     console.log('jwtTimeStamp', jwtTimeStamp);
     return jwtTimeStamp < changedTimeStamp;
+   
 };
 userSchema.methods.generatePasswordResetToken = async function(){
 

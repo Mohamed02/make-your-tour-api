@@ -13,6 +13,10 @@ const filterObject = (obj, allowedList) =>{
   })
   return newObj;
 }
+export const getMe = (req,res,next)=>{
+  req.params.id = req.user.id;
+  next();
+}
 export const getAllUsers = async(req, res) => {
     const users = await User.find();
     if(!users){
@@ -53,6 +57,7 @@ export const deleteMe = catchAsync(async (req, res, next) => {
     message: "you account deleted successfully"
   })
 });
+// this is not required, instead use signup to create new user
 export const createUser = (req, res) => {};
 /// Donot Update the Password with this
 export const updateUser = handlerfactory.updateOne(User);

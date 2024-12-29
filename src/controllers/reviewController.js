@@ -8,18 +8,6 @@ export const setTourAndUser =(req,res,next)=>{
 }
 export const createReview = handlerfactory.createOne(Review);
 export const getReview = handlerfactory.getOne(Review);
-export const getAllReviews = catchAsync(async (req, res, next)=>{
-    let filter ={}
-    if(req.params.tourId) filter={tour:req.params.tourId}
-
-    const reviews = await Review.find(filter);
-    res.status(201).send({
-        status: 'success',
-        results: reviews.length,
-        data: {
-            reviews
-        }
-    })
-});
+export const getAllReviews = handlerfactory.getAll(Review);
 export const deleteReview = handlerfactory.deleteOne(Review);
 export const updateReview = handlerfactory.updateOne(Review);

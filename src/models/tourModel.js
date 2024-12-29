@@ -112,6 +112,11 @@ const tourSchema = new mongoose.Schema({
     toJSON: { virtuals: true},
     toObject: {virtuals: true}
   });
+  // tourSchema.index({ price:1 });
+  tourSchema.index({ price:1, ratingsAverage: -1 });
+  tourSchema.index({ slug: 1 });
+  tourSchema.index({startLocation: '2dsphere'})
+
   tourSchema.virtual('durationWeeks').get(function(){
     return this.duration/7;
   });
@@ -163,12 +168,12 @@ const tourSchema = new mongoose.Schema({
   });
 
 // AGGREGATION MIDDLEWARE
-
-    tourSchema.pre('aggregate',function(next){
-        this.pipeline().unshift({$match:{secretTour:{$ne:true}}});
-        console.log('*****aggregation middle ware executed');
-        next();
-    })
+// commented the below piplelien as $geoNear has to be first pipelinein aggregate method
+    // tourSchema.pre('aggregate',function(next){
+    //     this.pipeline().unshift({$match:{secretTour:{$ne:true}}});
+    //     console.log('*****aggregation middle ware executed');
+    //     next();
+    // })
 
   const TourModel  = mongoose.model('Tour', tourSchema);
    export default TourModel;

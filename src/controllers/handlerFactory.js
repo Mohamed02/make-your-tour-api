@@ -56,14 +56,14 @@ const handlerfactory ={
   }),
   getAll: (Model)=> catchAsync(async (req, res, next) => {
 
-    /* Tech debt - added below condtion specific for getrevious
+    /* Tech debt - added below condtion specific for get previous
        to support nested GET request of review on tour object.
        */
       let filter ={}
       if(req.params.tourId) filter={tour:req.params.tourId}
-    // Tech debt 
 
     const query =  Model.find(filter);
+    // Update the query object based on the url query string param  using API Feature
     let apiFeatures = new APIFeature(query, req.query).filter().sort().fieldLimit().pagination();
 
       // const docs = await apiFeatures.query.explain();  // use explain to get the statistic of query

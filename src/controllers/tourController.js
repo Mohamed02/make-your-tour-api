@@ -14,10 +14,10 @@ const __filename = fileURLToPath(import.meta.url);
 // Calculate __dirname by getting the directory name from the filename
 const __dirname = dirname(__filename);
 
-const dataFilePath = path.resolve(__dirname, '../dev-data/data/tours-simple.json'); 
-export const tours = JSON.parse(
-  fs.readFileSync(dataFilePath,'utf-8'),
-);
+// const dataFilePath = path.resolve(__dirname, '../dev-data/data/tours-simple.json'); 
+// export const tours = JSON.parse(
+//   fs.readFileSync(dataFilePath,'utf-8'),
+// );
 
 export const aliasTopTours = (req,res,next)=>{
   req.query.limit = 5;

@@ -14,22 +14,23 @@ import {
 import { protect, restrictTo } from '../controllers/authController.js';
 import reviewRoute from './reviewRoutes.js';
 import { createReview } from '../controllers/reviewController.js';
+import { UserRole } from '../constants.js';
 
 const router = Router();
+router.route('/')
+  .get(getAllTours)
+  .post(protect, restrictTo([UserRole.ADMIN,UserRole.LEAD_GUIDE]), createTour);
+
 router.route('/top-5-cheap').get(aliasTopTours,getAllTours);
 router.route('/tour-stats').get(getTourStats);
 
 router.route('/monthly-plans/:year')
-  .get(protect, restrictTo(['admin','lead-guide', 'guide']),getMonthlyPlans);
-
-router.route('/')
-  .get(getAllTours)
-  .post(protect, restrictTo('lead-guide', 'admin'), createTour);
-
+  .get(protect, restrictTo([UserRole.ADMIN, UserRole.GUIDE, UserRole.LEAD_GUIDE]),getMonthlyPlans);
+  
 router.route('/:id')
   .get(getTour)
-  .patch(protect, restrictTo(['admin','lead-guide']),updateTour)
-  .delete(protect, restrictTo(['admin','lead-guide']) ,deleteTour); 
+  .patch(protect, restrictTo([UserRole.ADMIN,UserRole.LEAD_GUIDE]),updateTour)
+  .delete(protect, restrictTo([UserRole.ADMIN,UserRole.LEAD_GUIDE]) ,deleteTour); 
 
 
 router.get('/tours-within/:distance/centre/:latlong/unit/:unit',getToursWithin);

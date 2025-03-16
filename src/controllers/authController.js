@@ -65,7 +65,6 @@ export const forgotpassword = catchAsync(async (req, res, next)=>{
     // 2. Generate a reset password token , save it in the user model
         const resetToken =  await user.generatePasswordResetToken();
 
-        console.log('after generating token',resetToken);
         user.save({validateBeforeSave: false});
         const resetURL= `${req.protocol}://${req.get('host')}/api/v1/users/resetPassword/${resetToken}`;
         const message =`Forgot your password ! Submit a PATCH request with new password and confirm password
@@ -139,7 +138,6 @@ export const protect = catchAsync(async (req,res,next)=>{
     // 4. Checkif the user has  changed the password after retreivign the jwt token.
 
     const authHeader = req.headers['authorization'];
-    console.log('about to verify authHeader', authHeader);
     let token;
     if (authHeader && authHeader.startsWith('Bearer')) {
         // Authorization header is in the form "Bearer <token>"

@@ -46,9 +46,8 @@ export const login = async (req,res,next) => {
     // check if email and passwowrd is available in the request body
     if(!email || !password){
         return next(new AppError('Please provdie email and password !', 400));
-    }   
-    console.log('email', email);
-    // check if requested user is available in the datablse
+    }
+    // check if requested user is available in the database
     const user = await User.findOne({email}).select('+password');
     
     if(!user || ! await user.correctPassword(password, user.password)){
@@ -60,7 +59,9 @@ export const forgotpassword = catchAsync(async (req, res, next)=>{
     // 1. Get the emailid of the user
         const email = req.body.email;
         const user  = await User.findOne({email});
-        console.log('withing forgot passowred');
+        if(!user){
+            return next(new AppError('Invalid Username !', 404));
+        }
     // 2. Generate a reset password token , save it in the user model
         const resetToken =  await user.generatePasswordResetToken();
 
@@ -97,12 +98,12 @@ export const forgotpassword = catchAsync(async (req, res, next)=>{
 });
 export const resetpassword = catchAsync(async (req, res, next)=>{
     // 1. Get User based on the token
-
+    
     const hashedToken  = crypto.createHash('sha256').update(req.params.token).digest('hex');
 
     const user = await User.findOne({passwordResetToken: req.params.token, passwordResetTokenExpires: {$gte: Date.now()}});
 
-
+    
     // 2. If the token has not expired and there is a user then set the new password
     // 3. update the password created at time  
     if(!user){
@@ -115,10 +116,10 @@ export const resetpassword = catchAsync(async (req, res, next)=>{
         });
     }else{
         user.password = req.body.password;
-        user.passwordConfirm = req.passwordConfirm;
+        user.passwordConfirm = req.body.passwordConfirm;
         user.passwordResetToken=undefined;
         user.passwordResetTokenExpires=undefined;
-        user.save({validateBeforeSave:false});
+        await user.save({validateBeforeSave:false});
 
         createAndSendToken(user, 200, res);
        
@@ -146,7 +147,7 @@ export const protect = catchAsync(async (req,res,next)=>{
         if(!token){
             return next(new AppError('You are not looged in ! Please get access', 401))
         }
-        console.log('about to verify token', token);
+        
         const decodedPayload =   await verifyToken(token,process.env.JWT_SECRET);
         const user = await UserModel.findOne({_id: decodedPayload.id});
         if(!user){
@@ -154,14 +155,12 @@ export const protect = catchAsync(async (req,res,next)=>{
         }
 
         const isPasswordChanged = await user.passwordChanged(decodedPayload.iat);
-        console.log('isPasswordChanged', isPasswordChanged);
         if(isPasswordChanged){
             return next(new AppError('the password got updated after token generation. Please login again', 401));
         }
         req.user = user;
         return next();
     } else {
-        console.log('about to decode token', token);
         return next(new AppError('You are not looged in ! Please get access', 404))
     }
 });
@@ -187,6 +186,6 @@ export const updatepassword  = catchAsync( async(req,res,next) =>{
     user.password = req.body.newPassword;
     user.passwordConfirm = req.body.newPasswordConfirm;
     user.save({validateBeforeSave:false});
-    // FindByIDAndUpdate will not work as the middle wares and validations will not gets executed during findByIDAndUpdate
+    // FindByIDAndUpdate will not work as the middle wares and validations will not gets executed during findByIDAndUpdate    
     createAndSendToken(user,200,res);
    })

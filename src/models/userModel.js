@@ -84,8 +84,6 @@ userSchema.methods.generatePasswordResetToken = async function(){
     const resetToken = crypto.randomBytes(32).toString('hex');
     const hashResetToken= crypto.createHash('sha256').update(resetToken).digest('hex');
     const expirytime = Date.now()+ 10 * 60 * 1000;
-    console.log('this.passwordResetToken', hashResetToken);
-    console.log('this.passwordResetTokenExpires', expirytime);
     this.passwordResetToken = hashResetToken;
     this.passwordResetTokenExpires = expirytime;
     return hashResetToken;

@@ -15,11 +15,11 @@ const router = new Router();
 router.post('/signup', signup);
 router.post('/login', login);
 router.post('/forgotpassword', forgotpassword);
+router.patch('/resetpassword/:token', resetpassword);
 
 router.use(protect);
 
 router.patch('/updatepassword/:id', updatepassword);
-router.patch('/resetpassword/:token', resetpassword);
 
 router.get('/me', getMe, getUser);
 router.patch('/updateme', updateme);

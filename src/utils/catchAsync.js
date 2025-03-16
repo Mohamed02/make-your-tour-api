@@ -3,6 +3,7 @@ export const catchAsync = (fn)=>{
       try {
          await fn(req,res,next);
       } catch(error) {
+        // Transfer the error to Global error handler middleware
         next(error);
       }
     }

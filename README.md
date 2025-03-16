@@ -1,5 +1,4 @@
-# Make Your Tour API Documentation
-
+# Make Your Tour - API
 ## Introduction
 Welcome to the **"Make Your Tour"** API documentation! This API allows users to interact with a tour management system. It supports user authentication, tour management, review handling, and more.
 

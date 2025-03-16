@@ -14,7 +14,7 @@ export const sendEmail = async (options) =>{
         })
     // 2.  Define Email Service
     const mailOptions = {
-        from: 'Ismail Mohamed<emerald.mohamed@gmail.com>',
+        from: '<email id>',
         to: options.email,
         subject: options.subject,
         text: options.message

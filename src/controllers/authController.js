@@ -177,15 +177,19 @@ export const restrictTo = (roles)=>{
 export const updatepassword  = catchAsync( async(req,res,next) =>{
     // 1. get user form collection
      const user  = await User.findOne({_id: req.params.id}).select('+password');
+    if(!user){
+    return next(new AppError('Invalid User', 401));
+    }
     // 2. check if the current password is correct
      const isPasswordCorrect  = await user.correctPassword( req.body.password, user.password);
+
      if(!isPasswordCorrect){
         return next(new AppError('Invalid Current Password', 401));
      }
     // 3. Update the new password and send the updated token
     user.password = req.body.newPassword;
     user.passwordConfirm = req.body.newPasswordConfirm;
-    user.save({validateBeforeSave:false});
+    await user.save({validateBeforeSave:false});
     // FindByIDAndUpdate will not work as the middle wares and validations will not gets executed during findByIDAndUpdate    
     createAndSendToken(user,200,res);
    })

@@ -7,7 +7,7 @@ import jwt from 'jsonwebtoken';
 import { mockJWTtoken, mockUser1 } from '../__mocks__/userMocks.js';
 import { afterEach, before } from 'node:test';
 
-describe('GET /api/v1/users/signup', () => {
+describe('When User Signup', () => {
   let createUserStub;
   let signTokenStub;
     // Set up a stub for the User.create method
